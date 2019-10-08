@@ -1,5 +1,6 @@
 extern crate bigint;
 extern crate env_logger;
+#[macro_use]
 extern crate failure;
 // extern crate libvm;
 extern crate log;
@@ -10,6 +11,7 @@ extern crate trie;
 mod errors;
 pub mod eth_log;
 mod gas_prices;
+mod instruction;
 mod memory;
 mod opcodes;
 mod storage;

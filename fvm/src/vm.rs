@@ -5,7 +5,6 @@ use tiny_keccak::Keccak;
 
 use errors::{Result, VMError};
 use eth_log::Log;
-// use libvm::Cpu;
 use memory::{Memory, SimpleMemory};
 use opcodes::Opcode;
 use storage::Storage;
@@ -291,7 +290,7 @@ impl VM {
                     let mut k: [u8; 32] = [0; 32];
                     sha3.finalize(&mut k);
                     println!("k is: {:?}", k);
-                    self.registers[self.stack_pointer - 1] = M256::from(k);
+                    self.registers[self.stack_pointer - 1] = M256::from(&k[..]);
                     self.pc += 1;
                 }
             }
@@ -437,8 +436,8 @@ impl VM {
                     println!("Pushing logs");
                     self.logs.push(Log {
                         address: self.address.unwrap(),
-                        data: data,
-                        topics: topics,
+                        data,
+                        topics,
                     });
                 } else {
                     return Err(VMError::MemoryError);
