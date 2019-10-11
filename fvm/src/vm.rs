@@ -351,7 +351,7 @@ impl VM {
                 if let Some(ref mut store) = self.storage {
                     self.registers[self.stack_pointer] = store.read(s1.into()).unwrap();
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::SSTORE => {
@@ -362,11 +362,11 @@ impl VM {
                     match store.write(s1.into(), s2.into()) {
                         Ok(_) => {}
                         Err(_e) => {
-                            return Err(VMError::MemoryError);
+                            return Err(VMError::MemoryError.into());
                         }
                     }
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MLOAD => {
@@ -375,7 +375,7 @@ impl VM {
                 if let Some(ref mut mem) = self.memory {
                     self.registers[self.stack_pointer] = mem.read(offset);
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MSTORE => {
@@ -386,7 +386,7 @@ impl VM {
                     mem.write(offset, value)?;
                     self.pc += 1;
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MSTORE8 => {
@@ -403,7 +403,7 @@ impl VM {
                     self.registers[self.stack_pointer] = mem.size();
                     self.pc += 1;
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::PUSH(bytes) => {
@@ -440,11 +440,11 @@ impl VM {
                         topics,
                     });
                 } else {
-                    return Err(VMError::MemoryError);
+                    return Err(VMError::MemoryError.into());
                 }
             }
             _ => {
-                return Err(VMError::UnknownOpcodeError);
+                return Err(VMError::UnknownOpcodeError.into());
             }
         };
 

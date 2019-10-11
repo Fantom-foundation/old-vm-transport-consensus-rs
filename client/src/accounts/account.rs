@@ -1,21 +1,22 @@
 //! Contains functionality related to dealing with Accounts
 
-use hmac::Hmac;
-use keys;
-use openssl::symm;
-use rand::OsRng;
-use rand::Rng;
-use rustc_serialize::hex::ToHex;
-use secp256k1;
-use secp256k1::key::{PublicKey, SecretKey};
-use sha2::Sha256;
-use sha3::{Digest, Keccak256};
 use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
 use std::string::ToString;
 use std::{error::Error, fmt};
+
+use hmac::Hmac;
+use openssl::symm;
+use rustc_serialize::hex::ToHex;
+use secp256k1;
+use secp256k1::key::{PublicKey, SecretKey};
+use sha2::Sha256;
+use sha3::{Digest, Keccak256};
 use uuid;
+use getrandom;
+use keys;
+use rand::Rng;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 /// Basic Account structure for Fantom system
@@ -102,14 +103,15 @@ impl Account {
 
     /// Generates the ciphertext version of the secret key
     pub fn generate_cipher_text(secret_key: &secp256k1::key::SecretKey) -> (String, Vec<u8>) {
-        let mut generator = OsRng::new().unwrap();
+        let mut buf = [0u8; 32];
         // This section generates the ciphertext version of the secret key
         let cipher = symm::Cipher::aes_128_ctr();
         let mut key: Vec<u8> = vec![];
         let mut iv: Vec<u8> = vec![];
         for _ in 0..16 {
-            key.push(generator.gen());
-            iv.push(generator.gen());
+            getrandom::getrandom(&mut buf)?;
+            key.push();
+            iv.push(getrandom::getrandom(&mut buf)?);
         }
         // Takes the slice of data containing the secret key and encrypts it
         let data: &[u8] = &secret_key[0..secret_key.len()];
@@ -150,7 +152,6 @@ impl Account {
         public_key: PublicKey,
         secret_key: SecretKey,
     ) -> Result<Box<Account>, Box<dyn Error>> {
-        let mut generator = OsRng::new().expect("Unable to generate OsRng");
         self.id = uuid::Uuid::new_v4().to_hyphenated().to_string();
         let (ciphertext, iv) = Account::generate_cipher_text(&secret_key);
         let address = Account::get_address(public_key);
@@ -176,12 +177,8 @@ impl Account {
     ) -> Result<Box<Account>, Box<dyn Error>> {
         // This is the passphrase we'll use to encrypt their secret key, and they will need to
         // provide to decrypt it
-        let mut generator = match OsRng::new() {
-            Ok(g) => g,
-            Err(e) => {
-                return Err(Box::new(e));
-            }
-        };
+        let mut buf = [0u8; 32];
+        getrandom::getrandom(&mut buf)?;
 
         let passphrase = match keys::get_passphrase() {
             Ok(passphrase) => passphrase,
@@ -326,9 +323,11 @@ impl Error for AccountError {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use fs;
+
     use rustc_serialize::hex::*;
+
+    use super::*;
 
     fn get_test_secret_public() -> (secp256k1::key::SecretKey, secp256k1::key::PublicKey) {
         let secp = secp256k1::Secp256k1::with_caps(secp256k1::ContextFlag::Full);
