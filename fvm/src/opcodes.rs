@@ -1,5 +1,5 @@
+use crate::instruction::Instruction;
 use failure::Error;
-use libvm::Instruction;
 
 type Gas = u32;
 

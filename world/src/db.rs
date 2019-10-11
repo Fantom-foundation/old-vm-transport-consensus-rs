@@ -2,14 +2,17 @@
 //! Uses `rkv`, more info here: https://github.com/mozilla/rkv
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-// Database imports
-use rkv::{Manager, Readable, Rkv, StoreError, Value, StoreOptions, SingleStore};
+use bigint::H256;
+use rkv::store::Options as StoreOptions;
+use rkv::{Manager, Rkv, SingleStore, StoreError, Value};
 use tempdir::TempDir;
 use trie::TrieMut;
 
-use bigint::H256;
+// Database imports
+use lmdb::DatabaseFlags;
+use std::sync::RwLockReadGuard;
 
 pub type RDB = std::sync::Arc<std::sync::RwLock<rkv::Rkv>>;
 
@@ -18,8 +21,12 @@ pub fn create_temporary_db() -> Result<(RDB, SingleStore), StoreError> {
     let tempdir = TempDir::new("testing").unwrap();
     let root = tempdir.path();
     let created_arc = Manager::singleton().write().unwrap().get_or_create(root, Rkv::new)?;
+    let rkv_guard = created_arc.read().unwrap();
+
+    const DB_NAME: &'static str = "store";
+
     if let Ok(k) = created_arc.read() {
-        if let Ok(a) = k.open_single("store", StoreOptions::create()) {
+        if let Ok(a) = open_or_create(DB_NAME, rkv_guard) {
             return Ok((created_arc.clone(), a));
         }
     }
@@ -32,8 +39,11 @@ pub fn create_persistent_db(path: &str, name: &str) -> Result<(RDB, SingleStore)
     fs::create_dir_all(root.clone())?;
     let root = Path::new(&root);
     let created_arc = Manager::singleton().write().unwrap().get_or_create(root, Rkv::new)?;
+    const DB_NAME: &'static str = "store";
+
+    let rkv_guard = created_arc.read().unwrap();
     if let Ok(k) = created_arc.read() {
-        if let Ok(a) = k.open_single("store", StoreOptions::create()) {
+        if let Ok(a) = open_or_create(DB_NAME, rkv_guard) {
             return Ok((created_arc.clone(), a));
         }
     }
@@ -118,6 +128,20 @@ impl TrieMut for DB {
             Err(_e) => None,
         }
     }
+}
+
+fn open_or_create(db_name: &'static str, rkv_guard: RwLockReadGuard<Rkv>) -> Result<SingleStore, StoreError> {
+    Ok(rkv_guard.open_single(
+        db_name,
+        if PathBuf::from(db_name).exists() {
+            StoreOptions {
+                create: false,
+                flags: DatabaseFlags::empty(),
+            }
+        } else {
+            StoreOptions::create()
+        },
+    )?)
 }
 
 #[cfg(test)]
