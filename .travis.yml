@@ -18,18 +18,20 @@ before_cache:
   - rm -rf /home/travis/.cargo/registry
 before_script:
   - |
+    if [ "$TRAVIS_RUST_VERSION" = 'nightly' ]; then
+       printf -v RUSTFMT_VERSION '%s%s' '-' "$(curl https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/rustfmt)"
+       rustup default nightly"$RUSTFMT_VERSION"
+    fi
     if command -v cargo >/dev/null; then
-      export PATH=$HOME/.cargo/bin:$PATH
-      mkdir $(pwd)/socket
+      export PATH="$HOME/.cargo/bin:$PATH"
+      mkdir "$(pwd)"/socket
       export XDG_RUNTIME_DIR="$(pwd)/socket"
       cargo fetch
-      rustup component add rustfmt-preview
-      if [ -n "$CLIPPY" ]; then
-        rustup component add clippy
-      elif [ -n "$BUILD_FMT" ]; then
-        printf '$TRAVIS_RUST_VERSION = %s\n' "$TRAVIS_RUST_VERSION"
-        rustup component add rustfmt --toolchain nightly-x86_64-unknown-linux-gnu
-      fi
+    fi
+    if [ -n "$CLIPPY" ]; then
+      rustup component add clippy --toolchain "${TRAVIS_RUST_VERSION}${RUSTFMT_VERSION}"
+    elif [ -n "$BUILD_FMT" ]; then
+      rustup component add rustfmt --toolchain "${TRAVIS_RUST_VERSION}${RUSTFMT_VERSION}"
     fi
 script:
   - |
