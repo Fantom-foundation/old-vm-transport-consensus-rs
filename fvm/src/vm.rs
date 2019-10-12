@@ -356,7 +356,7 @@ impl VM {
                 if let Some(ref mut store) = self.storage {
                     self.registers[self.stack_pointer] = store.read(s1.into()).unwrap();
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::SSTORE => {
@@ -366,12 +366,10 @@ impl VM {
                 if let Some(ref mut store) = self.storage {
                     match store.write(s1.into(), s2.into()) {
                         Ok(_) => {}
-                        Err(_e) => {
-                            Err(VMError::MemoryError)?;
-                        }
+                        Err(_e) => return Err(VMError::MemoryError.into()),
                     }
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MLOAD => {
@@ -380,7 +378,7 @@ impl VM {
                 if let Some(ref mut mem) = self.memory {
                     self.registers[self.stack_pointer] = mem.read(offset);
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MSTORE => {
@@ -391,7 +389,7 @@ impl VM {
                     mem.write(offset, value)?;
                     self.pc += 1;
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::MSTORE8 => {
@@ -408,7 +406,7 @@ impl VM {
                     self.registers[self.stack_pointer] = mem.size();
                     self.pc += 1;
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
             Opcode::PUSH(bytes) => {
@@ -445,12 +443,10 @@ impl VM {
                         topics,
                     });
                 } else {
-                    Err(VMError::MemoryError)?;
+                    return Err(VMError::MemoryError.into());
                 }
             }
-            _ => {
-                Err(VMError::UnknownOpcodeError)?;
-            }
+            _ => return Err(VMError::UnknownOpcodeError.into()),
         };
         Ok(())
     }
