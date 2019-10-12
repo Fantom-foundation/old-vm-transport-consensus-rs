@@ -65,10 +65,7 @@ impl Memory for SimpleMemory {
     /// Reads a `word` at the provided index
     fn read(&self, index: M256) -> M256 {
         let index = index.as_usize();
-        self.memory[index..index + 32]
-            .to_vec()
-            .as_slice()
-            .into()
+        self.memory[index..index + 32].to_vec().as_slice().into()
     }
 
     /// Reads a single byte at the provided index
