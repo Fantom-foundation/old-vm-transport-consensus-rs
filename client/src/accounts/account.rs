@@ -47,7 +47,7 @@ impl Account {
         let address = public_result[start..end].to_string();
 
         Ok(Account {
-            address: address,
+            address,
             crypto: AccountCrypto::new(p, s),
             id,
             version,
@@ -124,12 +124,10 @@ impl Account {
         let path = std::path::PathBuf::from(base_dir.to_string() + filename);
         match File::create(path) {
             Ok(_) => Ok(()),
-            Err(e) => {
-                return Err(Box::new(AccountError::new(&format!(
-                    "There was an error saving: {:?}",
-                    e
-                ))));
-            }
+            Err(e) => Err(Box::new(AccountError::new(&format!(
+                "There was an error saving: {:?}",
+                e
+            )))),
         }
     }
 
@@ -154,7 +152,7 @@ impl Account {
         self.id = uuid::Uuid::new_v4().to_hyphenated().to_string();
         let (ciphertext, iv) = Account::generate_cipher_text(&secret_key);
         let address = Account::get_address(public_key);
-        Account::account_from_passphrase(&mut self.id.as_bytes(), &iv.to_hex(), &ciphertext, &address)
+        Account::account_from_passphrase(&self.id.as_bytes(), &iv.to_hex(), &ciphertext, &address)
     }
 
     pub fn get_account_filename(&self) -> String {
@@ -176,7 +174,7 @@ impl Account {
     ) -> Result<Box<Account>, Box<dyn Error>> {
         // This is the passphrase we'll use to encrypt their secret key, and they will need to
         // provide to decrypt it
-        let mut generator = OsRng::default();
+        let generator = OsRng::default();
 
         let passphrase = match keys::get_passphrase() {
             Ok(passphrase) => passphrase,

@@ -47,7 +47,7 @@ pub mod servers;
 
 type HmacSha256 = Hmac<Sha256>;
 
-const DIRECTORIES: [&'static str; 6] = ["data", "raft", "eth", "lachesis", "keys", "chaindata"];
+const DIRECTORIES: [&str; 6] = ["data", "raft", "eth", "lachesis", "keys", "chaindata"];
 pub fn main() {
     env_logger::init();
 

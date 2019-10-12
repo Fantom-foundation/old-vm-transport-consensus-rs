@@ -110,11 +110,11 @@ pub fn passwords_from_files(files: &[String]) -> Result<Vec<Password>, String> {
             Ok(lines)
         })
         .collect::<Result<Vec<Vec<Password>>, String>>();
-    Ok(passwords?.into_iter().flat_map(|x| x).collect())
+    Ok(passwords?.into_iter().flatten().collect())
 }
 
 mod tests {
-    use super::generate_random_keypair;
+    use keys::generate_random_keypair;
 
     #[test]
     fn test_generate_random_keypair() {

@@ -31,7 +31,7 @@ impl VM {
             memory: None,
             storage: None,
             stack_pointer: 0,
-            code: code,
+            code,
             pc: 0,
             logs: vec![],
         }
@@ -441,8 +441,8 @@ impl VM {
                     println!("Pushing logs");
                     self.logs.push(Log {
                         address: self.address.unwrap(),
-                        data: data,
-                        topics: topics,
+                        data,
+                        topics,
                     });
                 } else {
                     Err(VMError::MemoryError)?;

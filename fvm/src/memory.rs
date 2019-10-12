@@ -67,7 +67,7 @@ impl Memory for SimpleMemory {
         let index = index.as_usize();
         self.memory[index..index + 32]
             .iter()
-            .map(|v| v.clone())
+            .cloned()
             .collect::<Vec<u8>>()
             .as_slice()
             .into()
