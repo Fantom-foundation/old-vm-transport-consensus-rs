@@ -66,16 +66,14 @@ impl Memory for SimpleMemory {
     fn read(&self, index: M256) -> M256 {
         let index = index.as_usize();
         self.memory[index..index + 32]
-            .iter()
-            .cloned()
-            .collect::<Vec<u8>>()
+            .to_vec()
             .as_slice()
             .into()
     }
 
     /// Reads a single byte at the provided index
     fn read_byte(&self, index: M256) -> u8 {
-        self.memory[index.as_usize()].clone()
+        self.memory[index.as_usize()]
     }
 
     fn read_slice(&self, init_off_u: U256, init_size_u: U256) -> &[u8] {
@@ -112,7 +110,7 @@ impl Memory for SimpleMemory {
 
     /// Prints the contents of memory
     fn print(&self) -> String {
-        String::from(format!("{:#?}", self.memory))
+        format!("{:#?}", self.memory)
     }
 
     fn copy_from_memory(&self, start: U256, len: U256) -> Vec<u8> {

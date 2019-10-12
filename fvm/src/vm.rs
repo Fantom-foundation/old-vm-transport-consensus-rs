@@ -116,7 +116,7 @@ impl VM {
                 let s2 = MI256::from(self.registers[self.stack_pointer - 1]);
                 let result = s1 / s2;
                 let result: M256 = result.into();
-                self.registers[self.stack_pointer - 1] = result.into();
+                self.registers[self.stack_pointer - 1] = result;
                 self.pc += 1;
             }
             Opcode::SMOD => {
@@ -364,7 +364,7 @@ impl VM {
                 let s1 = self.registers[self.stack_pointer];
                 let s2 = self.registers[self.stack_pointer - 1];
                 if let Some(ref mut store) = self.storage {
-                    match store.write(s1.into(), s2.into()) {
+                    match store.write(s1.into(), s2) {
                         Ok(_) => {}
                         Err(_e) => return Err(VMError::MemoryError.into()),
                     }
