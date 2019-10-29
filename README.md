@@ -50,9 +50,20 @@ $ rustup component add rustfmt
 # Install clippy (Rust linter)
 $ rustup component add clippy
 # Clone this repo
-$ git clone https://github.com/Fantom-foundation/light-cli-rs && cd light-cli-rs
+$ git clone https://github.com/Fantom-foundation/evm-rs && cd evm-rs
 # Run tests
 $ cargo test
 # Format, build and test
 $ cargo make
 ```
+
+# Getting Started
+
+You can test the evm with the light version of the CLI included in the repository:
+
+```bash
+$ cd client
+$ cargo run
+```
+
+This will start a sever with the vm in the port specified by the file `cli.yml`.
