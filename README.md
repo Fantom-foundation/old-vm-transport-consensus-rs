@@ -1,6 +1,6 @@
-evm-rs
-------
-[![Rust: nightly](https://img.shields.io/badge/Rust-nightly-blue.svg)](https://www.rust-lang.org) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![Build Status](https://travis-ci.org/Fantom-foundation/evm-rs.svg?branch=master)](https://travis-ci.org/Fantom-foundation/evm-rs)
+OLD implementation with transport, consensus, vm all in one repo
+----------------------------------------------------------------
+[![Rust: nightly](https://img.shields.io/badge/Rust-nightly-blue.svg)](https://www.rust-lang.org) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![Build Status](https://travis-ci.org/Fantom-foundation/evm-rs.svg?branch=master)](https://travis-ci.org/Fantom-foundation/old-vm-transport-consensus-rs)
 
 This is a register-based virtual machine intended to execute transactions for the Fantom cryptocurrency. In its current state, it can function as an Ethereum VM and full node.
 
@@ -50,7 +50,7 @@ $ rustup component add rustfmt
 # Install clippy (Rust linter)
 $ rustup component add clippy
 # Clone this repo
-$ git clone https://github.com/Fantom-foundation/evm-rs && cd evm-rs
+$ git clone https://github.com/Fantom-foundation/old-vm-transport-consensus-rs && cd old-vm-transport-consensus-rs
 # Run tests
 $ cargo test
 # Format, build and test
