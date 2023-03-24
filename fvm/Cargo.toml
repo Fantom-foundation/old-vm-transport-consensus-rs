@@ -16,7 +16,7 @@ failure = "0.1.6"
 hmac = "0.7.1"
 libvm = { git = "https://github.com/Fantom-foundation/libvm", version = "0.1.5" }
 log = "0.4.8"
-openssl = "0.10.25"
+openssl = "0.10.48"
 pbkdf2 = "0.3.0"
 tiny-keccak = "1.5.0"
 rand = "0.7.2"
